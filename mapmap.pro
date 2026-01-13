@@ -5,10 +5,52 @@ CONFIG += c++11
 TEMPLATE = app
 
 # Always use major.minor.micro version number format
-VERSION = 0.6.3
+VERSION = 0.6.4
 TARGET = mapmap
 
 DEFINES += UNICODE QT_THREAD_SUPPORT QT_CORE_LIB QT_GUI_LIB QT_MESSAGELOGCONTEXT
+
+win32:msvc {
+    # Make Windows headers less invasive
+    DEFINES += WIN32_LEAN_AND_MEAN NOMINMAX
+
+    # Ensure the "right" APIENTRY/WINGDIAPI definitions are used before GL headers
+    # This forces windows.h to be included very early in every translation unit.
+    QMAKE_CXXFLAGS += /FIwindows.h
+
+    QT += opengl
+
+    GST_ROOT = C:/Program Files/gstreamer/1.0/msvc_x86_64
+
+    GSTREAMER_1_0_ROOT_X86 = $$GST_ROOT
+    GSTREAMER_1_0_ROOT_X86_64 = $$GST_ROOT
+    export(GSTREAMER_1_0_ROOT_X86)
+    export(GSTREAMER_1_0_ROOT_X86_64)
+
+    # Headers (do NOT $$quote() INCLUDEPATH entries for MSVC)
+    INCLUDEPATH += \
+    $$shell_path($$GST_ROOT/include/gstreamer-1.0) \
+    $$shell_path($$GST_ROOT/include/glib-2.0) \
+    $$shell_path($$GST_ROOT/lib/glib-2.0/include)
+
+
+    # Libraries (quote -L path because of the space in "Program Files")
+    GST_LIB = $$GST_ROOT/lib
+    LIBS += /LIBPATH:$$system_quote($$GST_LIB)
+    LIBS += \
+        $$system_quote($$GST_LIB/gstreamer-1.0.lib) \
+        $$system_quote($$GST_LIB/gstapp-1.0.lib) \
+        $$system_quote($$GST_LIB/gobject-2.0.lib) \
+        $$system_quote($$GST_LIB/glib-2.0.lib) \
+        -lopengl32
+
+    # (Optional but often needed) Ensure plugins can be found when running from Qt Creator
+    QMAKE_POST_LINK += set "GST_PLUGIN_PATH=$$GST_ROOT/lib/gstreamer-1.0"$$escape_expand(\\n\\t)
+    QMAKE_POST_LINK += set "PATH=$$GST_ROOT/bin;%PATH%"$$escape_expand(\\n\\t)
+
+    message("Using GStreamer from: $$GST_ROOT")
+}
+
 
 include(src/core/core.pri)
 include(src/shape/shape.pri)

@@ -10,6 +10,9 @@ greaterThan(QT_MAJOR_VERSION, 4) {
   QT += widgets webenginewidgets
 }
 
+DEFINES += QOSC_STATIC
+
+
 #Includes common configuration for all subdirectory .pro files.
 INCLUDEPATH += $$PWD/core \
     $$PWD/shape \
@@ -52,27 +55,24 @@ macx {
 win32 {
   DEFINES += WIN32
   TARGET = ../../../MapMap/MapMap # Just for release
-  GST_HOME = $$quote($$(GSTREAMER_1_0_ROOT_X86))
-  isEmpty(GST_HOME) {
-    message(\"GSTREAMER_1_0_ROOT_X86\" not detected ...)
-  }
-  else {
-    message(\"GSTREAMER_1_0_ROOT_X86\" detected in \"$${GST_HOME}\")
-  }
+  # Hard-set the path here (no env vars)
+  GST_HOME = C:/Program Files/gstreamer/1.0/msvc_x86_64
+  GST_LIB  = $$GST_HOME/lib
 
-  INCLUDEPATH += $${GST_HOME}/lib/gstreamer-1.0/include \
-    $${GST_HOME}/include/glib-2.0 \
-    $${GST_HOME}/lib/glib-2.0/include \
-    $${GST_HOME}/include/gstreamer-1.0
+  INCLUDEPATH += \
+    $$shell_path($$GST_HOME/include/gstreamer-1.0) \
+    $$shell_path($$GST_HOME/include/glib-2.0) \
+    $$shell_path($$GST_LIB/glib-2.0/include)
 
-  LIBS += $${GST_HOME}/lib/gstapp-1.0.lib \
-    $${GST_HOME}/lib/gstbase-1.0.lib \
-    $${GST_HOME}/lib/gstpbutils-1.0.lib \
-    $${GST_HOME}/lib/gstreamer-1.0.lib \
-    $${GST_HOME}/lib/gobject-2.0.lib \
-    $${GST_HOME}/lib/glib-2.0.lib \
-    $${GST_HOME}/lib/gstaudio-1.0.lib \
-    $${GST_HOME}/lib/gstvideo-1.0.lib \
+  LIBS += \
+    $$system_quote($$GST_LIB/gstapp-1.0.lib) \
+    $$system_quote($$GST_LIB/gstbase-1.0.lib) \
+    $$system_quote($$GST_LIB/gstpbutils-1.0.lib) \
+    $$system_quote($$GST_LIB/gstreamer-1.0.lib) \
+    $$system_quote($$GST_LIB/gobject-2.0.lib) \
+    $$system_quote($$GST_LIB/glib-2.0.lib) \
+    $$system_quote($$GST_LIB/gstaudio-1.0.lib) \
+    $$system_quote($$GST_LIB/gstvideo-1.0.lib) \
     -lopengl32
 
   CONFIG -= debug

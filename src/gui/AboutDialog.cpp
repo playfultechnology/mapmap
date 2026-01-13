@@ -81,7 +81,7 @@ void AboutDialog::createAboutTab()
   // Software description
   QString aboutSoftwareText = "<p>" + tr("MapMap is a free/open source video mapping software.") + "</p>";
   // Copyright and software owners
-  QString copyrightText = "<p>" + tr("Copyright &copy; 2013 %1.").arg(MM::COPYRIGHT_OWNERS) + "</p>";
+  QString copyrightText = "<p>" + tr("Copyright &copy; 2026 %1.").arg(MM::COPYRIGHT_OWNERS) + "</p>";
   // License short notice
   QFile licenseShortFile(":/license-short");
   licenseShortFile.open(QIODevice::ReadOnly | QIODevice::Text);

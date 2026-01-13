@@ -2,6 +2,15 @@
 
 #define USING_QT_5 (QT_VERSION >= QT_VERSION_CHECK(5,0,0))
 
+#include <QCoreApplication>
+#include <QDir>
+#include <QFile>
+
+#ifdef _WIN32
+#include <windows.h>
+#endif
+
+
 #include <iostream>
 #include <QTranslator>
 #include <QDebug>
@@ -30,6 +39,30 @@ static void set_env_vars_if_needed()
       std::cout << " * GST_DEBUG=2" << std::endl;
   //setenv("LANG", "C", 1);
 #endif // __MACOSX_CORE__
+
+#ifdef _WIN32
+  // Bundle layout (relative to MapMap.exe)
+  const QString base = QCoreApplication::applicationDirPath();
+  const QString gstRoot = QDir(base).filePath("gstreamer/1.0/msvc_x86_64");
+  const QString gstBin  = QDir(gstRoot).filePath("bin");
+  const QString gstPlugins = QDir(gstRoot).filePath("lib/gstreamer-1.0");
+
+  // 1) Make Windows loader find GStreamer DLLs without PATH
+  SetDefaultDllDirectories(LOAD_LIBRARY_SEARCH_DEFAULT_DIRS | LOAD_LIBRARY_SEARCH_USER_DIRS);
+  AddDllDirectory(reinterpret_cast<const wchar_t*>(gstBin.utf16()));
+
+  // 2) Make GStreamer find its plugins
+  qputenv("GST_PLUGIN_PATH", QFile::encodeName(gstPlugins));
+  // Optional (often unnecessary): also set the "1.0" variant
+  qputenv("GST_PLUGIN_PATH_1_0", QFile::encodeName(gstPlugins));
+
+  // Optional: keep registry next to exe (must be writable), or omit to use default
+  // qputenv("GST_REGISTRY", QFile::encodeName(QDir(base).filePath("gst-registry.bin")));
+
+  // Optional: debug
+  // qputenv("GST_DEBUG", "2");
+#endif
+
 }
 
 // This class is just used to provide sleep functionalities in the main() method.

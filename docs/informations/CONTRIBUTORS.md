@@ -26,5 +26,6 @@
 - Marc Lavallée: help with packaging.
 - Matthew Loewens : documentation, developer.
 - Madison Suniga : documentation.
+- Alastair Aitchison : developer.
 
 &nbsp;
